@@ -32,4 +32,9 @@ window.onload = function () {
         break;
     }
   });
+
+  restartButton.addEventListener('click', () =>
+    // reloads the browser
+    location.reload()
+  );
 };

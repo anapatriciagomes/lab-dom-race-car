@@ -34,7 +34,7 @@ class Game {
   }
 
   gameLoop() {
-    console.log('inside the game loop');
+    // console.log('inside the game loop');
 
     // interrupt the game loop if this variable has changed to true
     if (this.isGameOver) {
@@ -42,12 +42,64 @@ class Game {
     }
 
     this.update();
+    this.updateStats();
 
     window.requestAnimationFrame(() => this.gameLoop());
   }
 
   update() {
-    console.log('inside the update');
+    // console.log('inside the update');
     this.player.move();
+
+    if (Math.random() > 0.98 && this.obstacules.length < 1) {
+      this.obstacules.push(new Obstacle(this.gameScreen));
+    }
+
+    this.obstacules.forEach((obstacle, index) => {
+      obstacle.move();
+      if (this.player.didCollide(obstacle)) {
+        // remove the obstacle from the DOM
+        obstacle.element.remove();
+
+        // remove obstacle from obstacles array
+        this.obstacules.splice(index, 1);
+
+        // reduce the lives by 1
+        this.lives--;
+      } else if (obstacle.top > this.height) {
+        // increase the score by 1
+        this.score++;
+
+        // remove the obstacle from the DOM
+        obstacle.element.remove();
+
+        // remove the obstacle from the array
+        this.obstacules.splice(index, 1);
+      }
+    });
+
+    if (this.lives === 0) {
+      this.endGame();
+    }
+  }
+
+  endGame() {
+    // remove all elements from the screen
+    this.player.element.remove();
+    this.obstacules.forEach(obstacle => obstacle.element.remove());
+
+    this.isGameOver = true;
+
+    // hide the game and show the end screen
+    this.gameScreen.style.display = 'none';
+    this.gameEndScreen.style.display = 'block';
+  }
+
+  updateStats() {
+    const score = document.getElementById('score');
+    score.innerText = this.score;
+
+    const lives = document.getElementById('lives');
+    lives.innerText = this.lives;
   }
 }
